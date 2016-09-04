@@ -12,6 +12,8 @@ from pandas import DataFrame
 from sklearn.cross_validation import KFold
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import RidgeClassifier
+from sklearn.linear_model import SGDClassifier
+from sklearn.naive_bayes import MultinomialNB
 from sklearn.metrics import f1_score, accuracy_score
 from sklearn.pipeline import Pipeline
 
@@ -59,7 +61,7 @@ class Classifier:
                           issue_details['key']
 
             startFrom += page_size
-            if cursor.rowcount < page_size:
+            if cursor.rowcount < page_size or startFrom >= 500:
                 break
 
     def build_data_frame(self):
@@ -86,7 +88,7 @@ class Classifier:
         pipeline = Pipeline([
             ('count_vectorizer',
              TfidfVectorizer(strip_accents='unicode', analyzer='word', max_df=0.5, min_df=2, sublinear_tf=True)),
-            ('classifier', RidgeClassifier(tol=1e-2, solver="lsqr"))
+            ('classifier', MultinomialNB())
         ])
         return pipeline.fit(data['text'], data['class'])
 

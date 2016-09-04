@@ -1,6 +1,7 @@
 import ConfigParser
 import json
 import urllib2
+import numpy
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 
 from classes.classifier import Classifier
@@ -30,9 +31,16 @@ class MyHandler(BaseHTTPRequestHandler):
                         "description": str(searchTerm).lower()
                     }
                 })['fields']['description']])[0]
-                print(prediction)
+                accuracy = MyHandler.pipeline.predict_proba([transform.process_issue_structure({
+                    "fields": {
+                        "description": str(searchTerm).lower()
+                    }
+                })['fields']['description']])
+                accuracy = accuracy[0][numpy.where(MyHandler.pipeline.steps[1][1].classes_==prediction)[0]]
+                print accuracy[0]
+                print prediction
                 self.wfile.write(json.dumps({
-                    'customfield_15346': prediction
+                    'customfield_15346': prediction + ' - ' + '%.2f' % accuracy[0] + ' acc'
                 }))
                 return
             if self.path.startswith("/prediction"):
