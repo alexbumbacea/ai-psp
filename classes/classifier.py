@@ -61,7 +61,7 @@ class Classifier:
                           issue_details['key']
 
             startFrom += page_size
-            if cursor.rowcount < page_size or startFrom >= 500:
+            if cursor.rowcount < page_size:
                 break
 
     def build_data_frame(self):
